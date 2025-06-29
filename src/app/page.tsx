@@ -20,37 +20,51 @@ export default function Home() {
   ]);
 
   // 2. buat fungsi state untuk menambahkan perubahan todo dari input field
-  // PERBAIKAN: Pindahkan ke dalam komponen
+
   const [input, setInput] = useState<string>('');
 
   // 3. fungsi untuk menangani penambahan todo baru
-  // PERBAIKAN: Pindahkan ke dalam komponen
+
   const handeladdTodo = () => {
-    if (input.trim() !== '') {
-      // logika penambahan todo akan di isi disini 
-      console.log('Menambahkan To-do baru:', input);
-      setInput(''); // mengosongkan input setelah penambahan
-    } else {
-      console.log('Input tidak boleh kosong');
+    if (input.trim() !== '') { //Memerikas input apakah kosong atau tidak
+      // 1. Buat sebuah objek to-do yang baru
+      const newTodo = {
+        id: Date.now(), // Kita pakai waktu saat ini sebagai ID unik
+        text: input,      // Teksnya diambil dari state 'input'
+        completed: false  // Tugas baru pasti belum selesai
+      };
+      setTodos([...todos, newTodo]);
+      // 3. Kosongkan kembali kolom input
+      setInput('');
     }
   };
+
+  const handeleToggleTodo = (id: number) => {
+    setTodos(todos.map(todo =>
+      //pengecelkan apakah id todo cocok ketika ubah status completed
+      todo.id === id ? { ...todo,  completed: !todo.completed } : todo
+    ))
+  }
+
+  const handleDeleteTodo = (id: number) => {
+    // .filter akan membuat arry baru yang isinya item yang lolos dari kondisi yang di berikan
+    // saringan ini bertujuan agar semua simpanan todo yang id-nya tidak sama yang Tidak sama dengan id yang mau di hapus
+    setTodos(todos.filter(todo => todo.id !== id));
+  }
 
   // 4. Pernyataan return juga harus ada di dalam komponen
   return (
     <main className="flex min-h-screen flex-col items-center p-24 bg-gray-900 text-white">
-      {/* PERBAIKAN: Menghapus 'justify-between' dan 'item-center' menjadi 'items-center' */}
       <div className="w-full max-w-md">
-        {/* PERBAIKAN: Typo text-4xL menjadi text-4xl */}
         <h1 className="text-4xl font-bold mb-6 text-center">To-do List</h1>
 
-        {/* Input field untuk menambahkan todo baru */}
         <div className="flex gap-2 mb-4">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder='Apa Kegiatan Mu Hari Ini ?'
-            // PERBAIKAN: menghapus flex-1 karena flex-grow sudah cukup
+
             className='flex-grow p-2 rounded bg-gray-800 text-white border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
           />
           <button
@@ -59,17 +73,22 @@ export default function Home() {
             Tambah
           </button>
         </div>
-
         {/* Daftar todo */}
         <div className='space-y-2'>
-          {/* Variabel 'todos' sekarang bisa diakses karena berada dalam scope yang sama */}
           {todos.map(todo => (
-            // PERBAIKAN: typo items-center dan bg-gray-800
             <div key={todo.id} className='flex items-center justify-between bg-gray-800 p-3 rounded'>
-              {/* PERBAIKAN: typo todo.cpompleted menjadi todo.completed */}
-              <span className={todo.completed ? 'line-through text-gray-500' : ''}>
+              <span className={todo.completed ? 'line-through text-gray-500' : ''}
+              onClick={() => handeleToggleTodo(todo.id)}
+              >
                 {todo.text}
               </span>
+            {/* tombol Hapus Pada Todo */}
+              <button
+                onClick={() => handleDeleteTodo(todo.id)}
+                className='bg-red-600 hover:bg-red-700 text-white p-2 rounded'
+                >
+                Hapus
+              </button>
             </div>
           ))}
         </div>
